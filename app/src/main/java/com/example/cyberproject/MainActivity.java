@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                     String displayText;
                     if (currentUser.equals("comptePIRATE")) {
                         // 🔎 Vue "intrus" : il voit le texte CHIFFRÉ, pas le clair
-                        displayText = cipher;
+                        displayText = cipher.replace(" ", "");
                     } else {
                         // 👤 compte1 / compte2 : déchiffrage RSA
                         try {
