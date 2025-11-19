@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "172687577503",
+    "firebase_url": "https://cyberproject-b6d85-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "cyberproject-b6d85",
+    "storage_bucket": "cyberproject-b6d85.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172687577503:android:ae8c685e2beec68d07adaa",
+        "android_client_info": {
+          "package_name": "com.example.cyberproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEBTzvNBLO4iEd6swIMG5qoU4rAuN-HPU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
