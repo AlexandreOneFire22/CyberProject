@@ -1,30 +1,29 @@
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    >
-
-    <ListView
-        android:id="@+id/messageList"
-        android:layout_width="wrap_content"
-        android:layout_height="529dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        />
-
-    <EditText
-        android:id="@+id/messageInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="message"
-        android:layout_marginBottom="10dp"
-        />
+    android:orientation="vertical" android:padding="16dp"
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/sendButton"
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Déconnexion" />
+
+    <ListView
+        android:id="@+id/lvMessages"
+        android:layout_width="wrap_content"
+        android:layout_height="543dp"
+        android:layout_marginTop="10dp" />
+
+    <EditText
+        android:id="@+id/etMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Envoyer"
-        />
+        android:hint="Écris ton message" />
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Envoyer" />
 </LinearLayout>

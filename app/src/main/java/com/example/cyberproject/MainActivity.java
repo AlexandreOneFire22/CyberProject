@@ -2,65 +2,112 @@ package com.example.cyberproject;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ArrayAdapter;
+import android.widget.*;
+import android.content.Intent;
+import android.view.View;
+import com.google.firebase.database.*;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText messageInput;
-    private Button sendButton;
-    private ListView messageList;
-
-    private DatabaseReference dbRef;
-    private ArrayList<String> messages = new ArrayList<>();
+    private EditText etMessage;
+    private Button btnSend;
+    private ListView lvMessages;
     private ArrayAdapter<String> adapter;
+    private ArrayList<String> items = new ArrayList<>();
+
+    private DatabaseReference chatRef;
+    private String currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        messageInput = findViewById(R.id.messageInput);
-        sendButton = findViewById(R.id.sendButton);
-        messageList = findViewById(R.id.messageList);
+        etMessage = findViewById(R.id.etMessage);
+        btnSend = findViewById(R.id.btnSend);
+        lvMessages = findViewById(R.id.lvMessages);
 
-        // Lien vers ta base Firebase
-        dbRef = FirebaseDatabase.getInstance().getReference("messages");
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        lvMessages.setAdapter(adapter);
 
-        // Adapter pour afficher la liste des messages
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, messages);
-        messageList.setAdapter(adapter);
+        // Récupère le compte choisi
+        currentUser = getIntent().getStringExtra("userId");
+        if (currentUser == null) currentUser = "compte1"; // sécurité
 
-        // Envoi du message
-        sendButton.setOnClickListener(v -> {
-            String msg = messageInput.getText().toString();
-            if (!msg.isEmpty()) {
-                dbRef.push().setValue(msg); // Envoie dans Firebase
-                messageInput.setText("");
-            }
+        // comptePIRATE = lecture seule + cache les boutons d'envoi
+        if (currentUser.equals("comptePIRATE")) {
+            etMessage.setVisibility(View.GONE);
+            btnSend.setVisibility(View.GONE);
+        }
+
+        chatRef = FirebaseDatabase.getInstance().getReference("chat_global");
+
+        // ENVOI D'UN MESSAGE : on chiffre AVANT d'envoyer dans Firebase
+        btnSend.setOnClickListener(v -> {
+            String msg = etMessage.getText().toString().trim();
+            if (msg.isEmpty()) return;
+
+            // Chiffrement RSA perso
+            String cipher = CryptoUtils.encrypt(msg);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("cipher", cipher);                 // seul texte stocké : CHIFFRÉ
+            data.put("sender", currentUser);
+            data.put("timestamp", ServerValue.TIMESTAMP);
+
+            chatRef.push().setValue(data);
+            etMessage.setText("");
         });
 
-        // Réception en temps réel
-        dbRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
-            @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
-                messages.clear();
-                for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
-                    messages.add(child.getValue(String.class));
+        // BOUTON DECONNEXION
+        Button btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, SelectUserActivity.class));
+            finish();
+        });
+
+        listenForMessages();
+    }
+
+    private void listenForMessages() {
+        chatRef.addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(DataSnapshot snapshot) {
+                items.clear();
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    String cipher = child.child("cipher").getValue(String.class);
+                    String sender = child.child("sender").getValue(String.class);
+                    Long time = child.child("timestamp").getValue(Long.class);
+
+                    if (cipher == null || sender == null || time == null) continue;
+
+                    String when = sdf.format(new Date(time));
+
+                    String displayText;
+                    if (currentUser.equals("comptePIRATE")) {
+                        // 🔎 Vue "intrus" : il voit le texte CHIFFRÉ, pas le clair
+                        displayText = cipher;
+                    } else {
+                        // 👤 compte1 / compte2 : déchiffrage RSA
+                        try {
+                            displayText = CryptoUtils.decrypt(cipher);
+                        } catch (Exception e) {
+                            displayText = "[ERREUR DECHIFFREMENT] " + cipher;
+                        }
+                    }
+
+                    items.add("[" + when + "] " + sender + ": " + displayText);
                 }
+
                 adapter.notifyDataSetChanged();
+                lvMessages.setSelection(items.size() - 1);
             }
 
-            @Override
-            public void onCancelled(com.google.firebase.database.DatabaseError error) {
-            }
+            @Override public void onCancelled(DatabaseError error) {}
         });
     }
 }

@@ -11,15 +11,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CyberProject">
+
+        <!-- Écran de sélection de l'utilisateur (NOUVEAU ÉCRAN DE LANCEMENT) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".SelectUserActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Écran du chat -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
+
     </application>
 
 </manifest>
