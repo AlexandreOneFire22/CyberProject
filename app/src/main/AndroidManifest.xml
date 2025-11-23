@@ -15,6 +15,7 @@
         <!-- Écran de sélection de l'utilisateur (NOUVEAU ÉCRAN DE LANCEMENT) -->
         <activity
             android:name=".SelectUserActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

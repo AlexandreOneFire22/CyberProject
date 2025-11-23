@@ -38,8 +38,8 @@ public class CryptoUtils {
 
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < numeric.length(); i += 4) {
-            int end = Math.min(i + 4, numeric.length());
+        for (int i = 0; i < numeric.length(); i += 2) {
+            int end = Math.min(i + 2, numeric.length());
             int x = Integer.parseInt(numeric.substring(i, end));
 
             int y = modPow(x, E, N);
@@ -62,7 +62,7 @@ public class CryptoUtils {
             int y = Integer.parseInt(block);
             int x = modPow(y, D, N);
 
-            numeric.append(String.format("%04d", x));
+            numeric.append(String.format("%02d", x));
         }
 
         return numericToText(numeric.toString());
