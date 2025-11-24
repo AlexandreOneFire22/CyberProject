@@ -42,6 +42,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageButton
+            android:id="@+id/btnPlus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_input_add"
+            android:contentDescription="Ajouter un média"
+            android:background="@android:color/transparent"/>
+
         <EditText
             android:id="@+id/etMessage"
             android:layout_width="0dp"
