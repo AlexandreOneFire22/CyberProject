@@ -65,6 +65,19 @@ public class MainActivity extends AppCompatActivity {
         // Référence Firebase
         chatRef = FirebaseDatabase.getInstance().getReference("chat_global");
 
+        final View rootView = findViewById(android.R.id.content);
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
+
+            // Si plus de 200px ont disparu → le clavier est ouvert
+            if (heightDiff > 200) {
+                rvMessages.postDelayed(() ->
+                                rvMessages.scrollToPosition(messages.size() - 1),
+                        100
+                );
+            }
+        });
+
         // Bouton d’envoi
         btnSend.setOnClickListener(v -> {
             String msg = etMessage.getText().toString().trim();
