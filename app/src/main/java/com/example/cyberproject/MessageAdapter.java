@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,14 +19,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private static final int TYPE_SENT = 1;
     private static final int TYPE_RECEIVED = 2;
 
+    public interface OnMessageClickListener {
+        void onMessageClick(Message message);
+    }
+
     private ArrayList<Message> messages;
     private Context context;
     private String currentUser;
+    private OnMessageClickListener listener;
 
-    public MessageAdapter(Context context, ArrayList<Message> messages, String currentUser) {
+    public MessageAdapter(Context context, ArrayList<Message> messages, String currentUser,
+                          OnMessageClickListener listener) {
         this.context = context;
         this.messages = messages;
         this.currentUser = currentUser;
+        this.listener = listener;
     }
 
     @Override
@@ -53,6 +62,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         holder.txtTime.setText(sdf.format(new Date(msg.getTimestamp())));
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onMessageClick(msg);
+        });
     }
 
     @Override

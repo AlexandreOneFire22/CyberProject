@@ -10,10 +10,6 @@ import java.io.FileOutputStream;
 
 public class FileHelper {
 
-    /**
-     * Écrit un fichier temporaire déchiffré dans le cache
-     * et retourne une Uri lisible par d'autres apps.
-     */
     public static Uri writeTempFile(Context ctx, byte[] bytes, String mime) throws Exception {
         String ext = guessExt(mime);
         File outFile = new File(ctx.getCacheDir(), "dec_" + System.currentTimeMillis() + ext);
@@ -22,7 +18,6 @@ public class FileHelper {
         fos.write(bytes);
         fos.close();
 
-        // FileProvider requis
         return FileProvider.getUriForFile(
                 ctx,
                 ctx.getPackageName() + ".provider",
@@ -31,6 +26,7 @@ public class FileHelper {
     }
 
     private static String guessExt(String mime) {
+        if (mime == null) return ".bin";
         if (mime.startsWith("image/")) return ".jpg";
         if (mime.startsWith("video/")) return ".mp4";
         if (mime.startsWith("audio/")) return ".mp3";
