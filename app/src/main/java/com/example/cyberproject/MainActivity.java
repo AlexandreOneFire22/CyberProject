@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ---------------- OUVERTURE MEDIA ----------------
-    private void openMediaMessage(Message m) {
+    public void openMediaMessage(Message m) {
         new Thread(() -> {
             try {
                 String keyB64 = CryptoUtils.decrypt(m.getMediaKeyCipher());

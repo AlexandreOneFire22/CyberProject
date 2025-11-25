@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.graphics.Paint;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,14 +58,72 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
-        Message msg = messages.get(position);
-        holder.txtMessage.setText(msg.getText());
 
+        Message msg = messages.get(position);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         holder.txtTime.setText(sdf.format(new Date(msg.getTimestamp())));
 
+        // -------------------------
+        // CAS 1 : MESSAGE TEXTE
+        // -------------------------
+        if (!msg.isMedia()) {
+
+            // Compte pirate : afficher le texte chiffré brut
+            if (currentUser.equals("comptePIRATE")) {
+                holder.txtMessage.setText(msg.getText());
+                holder.txtMessage.setTextColor(0xFF000000);
+                holder.txtMessage.setPaintFlags(holder.txtMessage.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
+                holder.itemView.setOnClickListener(null);
+                return;
+            }
+
+            // Compte normal
+            holder.txtMessage.setText(msg.getText());
+            holder.txtMessage.setTextColor(0xFF000000);
+            holder.txtMessage.setPaintFlags(holder.txtMessage.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
+            holder.itemView.setClickable(false);
+            return;
+        }
+
+        // -------------------------
+        // CAS 2 : MEDIA POUR COMPTE PIRATE (AFFICHAGE BRUT)
+        // -------------------------
+        if (currentUser.equals("comptePIRATE")) {
+
+            String supabaseUrl =
+                    "https://csxqhbltrwtgfactwkln.supabase.co/storage/v1/object/Media/" +
+                            msg.getMediaPath();
+
+            String raw =
+                    "type=media\n" +
+                            "supabaseUrl=" + supabaseUrl + "\n" +
+                            "mediaPath=" + msg.getMediaPath() + "\n" +
+                            "mediaMime=" + msg.getMediaMime() + "\n" +
+                            "mediaKeyCipher=" + msg.getMediaKeyCipher() + "\n" +
+                            "mediaIvCipher=" + msg.getMediaIvCipher() + "\n" +
+                            "sender=" + msg.getSender() + "\n" +
+                            "timestamp=" + msg.getTimestamp();
+
+            holder.txtMessage.setText(raw);
+            holder.txtMessage.setTextColor(0xFF000000); // noir
+            holder.txtMessage.setPaintFlags(holder.txtMessage.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
+            holder.itemView.setOnClickListener(null); // PAS DE CLIC
+            return;
+        }
+
+        // -------------------------
+        // CAS 3 : MEDIA POUR COMPTE NORMAL → lien bleu
+        // -------------------------
+        String visuallyClearText = "📎 Média (" + msg.getMediaMime() + ")";
+
+        holder.txtMessage.setText(visuallyClearText);
+        holder.txtMessage.setTextColor(0xFF1565C0); // bleu style lien
+        holder.txtMessage.setPaintFlags(holder.txtMessage.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onMessageClick(msg);
+            if (context instanceof MainActivity) {
+                ((MainActivity) context).openMediaMessage(msg);
+            }
         });
     }
 
